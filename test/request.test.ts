@@ -8,10 +8,7 @@ import { Json } from "../src/payload.ts";
 Deno.test(
   "Must do a get request",
   async () => {
-    const response = await new Get(
-      "https://api.thedogapi.com/v1",
-      new Headers(new ContentType("application/json"))
-    ).send();
+    const response = await new Get("https://api.thedogapi.com/v1").send();
     const content = JSON.parse(await response.content());
     assertEquals(content.message, "The Dog API");
   }
@@ -22,10 +19,7 @@ Deno.test(
   async () => {
     const response = await new Get(
       "https://api.thedogapi.com/v1",
-      new Headers(
-        new ContentType("application/json"),
-        new XapiAuth(config.THEDOGAPI_TOKEN)
-      )
+      new Headers(new XapiAuth(config.THEDOGAPI_TOKEN))
     ).send();
     const content = JSON.parse(await response.content());
     assertEquals(content.message, "The Dog API");

@@ -14,7 +14,7 @@ export class Get implements Request {
 
   constructor(
     url: string,
-    headers: Headers,
+    headers: Headers = new Headers(),
     wire: Wire = new FetchWire()
   ) {
     this.url = url;
