@@ -1,4 +1,4 @@
-import { Wire } from "./wire.ts";
+import { FetchWire, Wire } from "./wire.ts";
 import { Response } from "./response.ts";
 import { Headers } from "./headers.ts";
 import { Payload } from "./payload.ts";
@@ -8,14 +8,18 @@ export interface Request {
 }
 
 export class Get implements Request {
-  private readonly wire: Wire;
   private readonly url: string;
   private readonly headers: Headers;
+  private readonly wire: Wire;
 
-  constructor(wire: Wire, url: string, headers: Headers) {
-    this.wire = wire;
+  constructor(
+    url: string,
+    headers: Headers,
+    wire: Wire = new FetchWire()
+  ) {
     this.url = url;
     this.headers = headers;
+    this.wire = wire;
   }
 
   send(): Promise<Response> {
@@ -30,16 +34,21 @@ export class Get implements Request {
 }
 
 export class Post<T> implements Request {
-  private readonly wire: Wire;
   private readonly url: string;
   private readonly payload: Payload;
   private readonly headers: Headers;
+  private readonly wire: Wire;
 
-  constructor(wire: Wire, url: string, payload: Payload, headers: Headers) {
-    this.wire = wire;
+  constructor(
+    url: string,
+    payload: Payload,
+    headers: Headers,
+    wire: Wire = new FetchWire()
+  ) {
     this.url = url;
-    this.headers = headers;
     this.payload = payload;
+    this.headers = headers;
+    this.wire = wire;
   }
 
   send(): Promise<Response> {

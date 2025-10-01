@@ -1,5 +1,4 @@
 import { assertEquals } from "@std/assert";
-import { FetchWire } from "../src/wire.ts";
 import { ContentType, XapiAuth } from "../src/header.ts";
 import { Get, Post } from "../src/request.ts";
 import { Headers } from "../src/headers.ts";
@@ -10,7 +9,6 @@ Deno.test(
   "Must do a get request",
   async () => {
     const response = await new Get(
-      new FetchWire(),
       "https://api.thedogapi.com/v1",
       new Headers(new ContentType("application/json"))
     ).send();
@@ -23,7 +21,6 @@ Deno.test(
   "Must do a authenticated get request",
   async () => {
     const response = await new Get(
-      new FetchWire(),
       "https://api.thedogapi.com/v1",
       new Headers(
         new ContentType("application/json"),
@@ -39,7 +36,6 @@ Deno.test(
   "Must do a authenticated post request",
   async () => {
     const response = await new Post(
-      new FetchWire(),
       "https://api.thedogapi.com/v1/votes",
       new Json(
         {
