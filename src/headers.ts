@@ -7,6 +7,10 @@ export class Headers {
     this.items = items;
   }
 
+  count(): number {
+    return this.items.length;
+  }
+
   records(): Record<string, string> {
     return this.items.reduce(
       (acc, header) => {
