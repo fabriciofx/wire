@@ -1,7 +1,7 @@
 import { FetchWire, Wire } from "./wire.ts";
 import { Response } from "./response.ts";
 import { Headers } from "./headers.ts";
-import { Payload, Empty } from "./payload.ts";
+import { Payload } from "./payload.ts";
 
 export interface Request {
   send(): Promise<Response>;
@@ -27,8 +27,7 @@ export class Get implements Request {
       this.url,
       {
         method: "GET",
-        headers: this.headers,
-        payload: new Empty()
+        headers: this.headers
       }
     );
   }

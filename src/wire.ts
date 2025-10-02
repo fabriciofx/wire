@@ -5,7 +5,7 @@ import { Response, FetchResponse } from "./response.ts";
 export interface Params {
   method: string;
   headers: Headers;
-  payload: Payload;
+  payload?: Payload;
 }
 
 export interface Wire {
@@ -15,34 +15,14 @@ export interface Wire {
 export class FetchWire implements Wire {
   async send(url: string, params: Params): Promise<Response> {
     try {
-      let response;
-      if (params.headers.count() > 0) {
-        if (params.payload.size() > 0) {
-          response = await fetch(
-            url,
-            {
-              method: params.method,
-              headers: params.headers.records(),
-              body: params.payload.stream()
-            }
-          );
-        } else {
-          response = await fetch(
-            url,
-            {
-              method: params.method,
-              headers: params.headers.records()
-            }
-          );
+      const response = await fetch(
+        url,
+        {
+          method: params.method,
+          headers: params.headers.records(),
+          body: params.payload?.stream()
         }
-      } else {
-        response = await fetch(
-          url,
-          {
-            method: params.method
-          }
-        );
-      }
+      );
       if (!response.ok) {
         throw new Error(`(${response.status}) ${response.statusText}`);
       }
