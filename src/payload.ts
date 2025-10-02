@@ -10,7 +10,7 @@ export interface Payload {
   stream(): ReadableStream<Uint8Array>;
 }
 
-export class Json implements Payload {
+export class JsonPayload implements Payload {
   private readonly json: JsonType;
 
   constructor(json: JsonType) {

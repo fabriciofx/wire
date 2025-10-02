@@ -3,7 +3,7 @@ import { ContentType, XapiAuth } from "../src/header.ts";
 import { Get, Post } from "../src/request.ts";
 import { Headers } from "../src/headers.ts";
 import * as config from "./config.ts";
-import { Json } from "../src/payload.ts";
+import { JsonPayload } from "../src/payload.ts";
 import { JsonContent } from "../src/content.ts";
 
 Deno.test(
@@ -35,7 +35,7 @@ Deno.test(
     const content = await new JsonContent(
       new Post(
         "https://api.thedogapi.com/v1/votes",
-        new Json(
+        new JsonPayload(
           {
             "image_id": "asf2",
             "sub_id": "user123",
