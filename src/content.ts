@@ -1,7 +1,11 @@
 // deno-lint-ignore-file no-explicit-any
 import { Request } from "../src/request.ts";
 
-export class JsonContent {
+export interface Content<T> {
+  content(): Promise<T>;
+}
+
+export class JsonContent implements Content<any> {
   private readonly request: Request;
 
   constructor(request: Request) {
@@ -10,6 +14,8 @@ export class JsonContent {
 
   async content(): Promise<any> {
     const response = await this.request.send();
-    return response.json();
+    const bytes = await response.bytes();
+    const text = new TextDecoder().decode(bytes);
+    return JSON.parse(text);
   }
 }

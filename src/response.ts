@@ -1,7 +1,5 @@
-// deno-lint-ignore-file no-explicit-any
 export interface Response {
-  text(): Promise<string>;
-  json(): Promise<any>;
+  bytes(): Promise<Uint8Array>;
   status(): number;
 }
 
@@ -12,12 +10,8 @@ export class FetchResponse implements Response {
     this.response = response;
   }
 
-  async text(): Promise<string> {
-    return await this.response.text();
-  }
-
-  async json(): Promise<any> {
-    return await this.response.json();
+  async bytes(): Promise<Uint8Array> {
+    return await this.response.bytes();
   }
 
   status(): number {
