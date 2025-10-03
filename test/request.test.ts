@@ -7,7 +7,7 @@ import { JsonPayload } from "../src/payload.ts";
 import { JsonContent } from "../src/content.ts";
 
 Deno.test(
-  "Must do a get request",
+  "Must do a simle get request",
   async () => {
     const content = await new JsonContent(
       new Get("https://api.thedogapi.com/v1")
@@ -17,7 +17,7 @@ Deno.test(
 );
 
 Deno.test(
-  "Must do a authenticated get request",
+  "Must do an authenticated get request",
   async () => {
     const content = await new JsonContent(
       new Get(
@@ -30,7 +30,7 @@ Deno.test(
 );
 
 Deno.test(
-  "Must do a authenticated post request",
+  "Must do an authenticated post request",
   async () => {
     const content = await new JsonContent(
       new Post(
