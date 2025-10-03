@@ -41,13 +41,13 @@ export class Post<T> implements Request {
 
   constructor(
     url: string,
-    payload: Payload,
     headers: Headers,
+    payload: Payload,
     wire: Wire = new FetchWire()
   ) {
     this.url = url;
-    this.payload = payload;
     this.headers = headers;
+    this.payload = payload;
     this.wire = wire;
   }
 

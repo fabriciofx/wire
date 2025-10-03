@@ -35,16 +35,16 @@ Deno.test(
     const content = await new JsonContent(
       new Post(
         "https://api.thedogapi.com/v1/votes",
+        new Headers(
+          new ContentType("application/json"),
+          new XapiAuth(config.THEDOGAPI_TOKEN)
+        ),
         new JsonPayload(
           {
             "image_id": "asf2",
             "sub_id": "user123",
             "value": 1
           }
-        ),
-        new Headers(
-          new ContentType("application/json"),
-          new XapiAuth(config.THEDOGAPI_TOKEN)
         )
       )
     ).content();
