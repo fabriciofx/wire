@@ -3,7 +3,8 @@
     "start": "deno run --allow-all src/main.ts",
     "reload": "deno run --reload src/main.ts",
     "dev": "deno run --watch src/main.ts",
-    "test": "deno test --allow-all test/**/*.test.ts"
+    "test": "deno test --allow-all test/**/*.test.ts",
+    "coverage": "deno test --allow-all --coverage=cov"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
