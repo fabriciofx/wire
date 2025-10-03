@@ -1,5 +1,5 @@
 export interface Response {
-  bytes(): Promise<Uint8Array>;
+  bytes(): Promise<Uint8Array<ArrayBuffer>>;
   status(): number;
 }
 
@@ -10,7 +10,7 @@ export class FetchResponse implements Response {
     this.response = response;
   }
 
-  async bytes(): Promise<Uint8Array> {
+  async bytes(): Promise<Uint8Array<ArrayBuffer>> {
     return await this.response.bytes();
   }
 

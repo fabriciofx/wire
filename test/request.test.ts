@@ -4,7 +4,7 @@ import { Get, Post } from "../src/request.ts";
 import { Headers } from "../src/headers.ts";
 import * as config from "./config.ts";
 import { JsonPayload } from "../src/payload.ts";
-import { JsonContent } from "../src/content.ts";
+import { JsonContent, FileContent } from "../src/content.ts";
 
 Deno.test(
   "Must do a simle get request",
@@ -26,6 +26,19 @@ Deno.test(
       )
     ).content();
     assertEquals(content.message, "The Dog API");
+  }
+);
+
+Deno.test(
+  "Must download and save an image",
+  async () => {
+    const file = await new FileContent(
+      new Get("https://cdn2.thedogapi.com/images/BJa4kxc4X.jpg"),
+      "black-dog.jpg"
+    ).content();
+    const bytes = await file.bytes();
+    const blackDog = await Deno.readFile("./test/resources/black-dog.jpg");
+    assertEquals(bytes, blackDog);
   }
 );
 

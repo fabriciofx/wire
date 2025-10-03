@@ -19,3 +19,19 @@ export class JsonContent implements Content<any> {
     return JSON.parse(text);
   }
 }
+
+export class FileContent implements Content<File> {
+  private readonly request: Request;
+  private readonly name: string;
+
+  constructor(request: Request, name: string) {
+    this.request = request;
+    this.name = name;
+  }
+
+  async content(): Promise<File> {
+    const response = await this.request.send();
+    const bytes = await response.bytes();
+    return new File([bytes], this.name);
+  }
+}
