@@ -4,19 +4,19 @@ export interface Response<T> {
 }
 
 export class FetchResponse<T> implements Response<T> {
-  private readonly _data: T;
-  private readonly _status: number;
+  private readonly datum: T;
+  private readonly code: number;
 
   constructor(data: T, status: number) {
-    this._data = data;
-    this._status = status;
+    this.datum = data;
+    this.code = status;
   }
 
   data(): T {
-    return this._data;
+    return this.datum;
   }
 
   status(): number {
-    return this._status;
+    return this.code;
   }
 }
