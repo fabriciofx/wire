@@ -9,12 +9,12 @@ export interface Request<T> {
 export class Get<T> implements Request<T> {
   private readonly url: string;
   private readonly headers: Headers;
-  private readonly wire: Wire<T>;
+  private readonly wire: Wire<T, T>;
 
   constructor(
     url: string,
     headers: Headers = new Headers(),
-    wire: Wire<T> = new FetchWire<T>()
+    wire: Wire<T, T> = new FetchWire<T, T>()
   ) {
     this.url = url;
     this.headers = headers;
@@ -29,17 +29,17 @@ export class Get<T> implements Request<T> {
   }
 }
 
-export class Post<T> implements Request<T> {
+export class Post<X, Y> implements Request<Y> {
   private readonly url: string;
-  private readonly payload: T;
+  private readonly payload: X;
   private readonly headers: Headers;
-  private readonly wire: Wire<T>;
+  private readonly wire: Wire<X, Y>;
 
   constructor(
     url: string,
     headers: Headers,
-    payload: T,
-    wire: Wire<T> = new FetchWire<T>()
+    payload: X,
+    wire: Wire<X, Y> = new FetchWire<X, Y>()
   ) {
     this.url = url;
     this.headers = headers;
@@ -47,7 +47,7 @@ export class Post<T> implements Request<T> {
     this.wire = wire;
   }
 
-  send(): Promise<Response<T>> {
+  send(): Promise<Response<Y>> {
     return this.wire.send(this.url, {
       method: 'POST',
       headers: this.headers,
