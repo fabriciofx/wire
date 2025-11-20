@@ -1,4 +1,4 @@
-import { ContentType, type Header, XapiAuth } from './header.ts';
+import type { Header } from './header.ts';
 import { Headers } from './headers.ts';
 import type { Response } from './response.ts';
 import { FetchWire, type Wire } from './wire.ts';
@@ -63,25 +63,5 @@ export class Post<X, Y> implements Request<Y> {
       headers: this.headers,
       payload: this.payload
     });
-  }
-}
-
-export class AuthWithToken<T> implements Request<T> {
-  private readonly origin: Request<T>;
-  private readonly token: string;
-
-  constructor(request: Request<T>, token: string) {
-    this.origin = request;
-    this.token = token;
-  }
-
-  with(header: Header): void {
-    this.origin.with(header);
-  }
-
-  send(): Promise<Response<T>> {
-    this.with(new ContentType('application/json'));
-    this.with(new XapiAuth(this.token));
-    return this.origin.send();
   }
 }

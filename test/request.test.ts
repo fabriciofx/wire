@@ -1,5 +1,6 @@
 import { assertEquals } from '@std/assert';
-import { AuthWithToken, Get, Post } from '../src/request.ts';
+import { AuthWithToken } from '../src/auth.ts';
+import { Get, Post } from '../src/request.ts';
 import * as config from './config.ts';
 
 type DogResponse = {
