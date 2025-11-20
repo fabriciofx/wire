@@ -11,6 +11,10 @@ export class Headers {
     return this.items.length;
   }
 
+  add(header: Header) {
+    this.items.push(header);
+  }
+
   records(): Record<string, string> {
     return this.items.reduce(
       (acc, header) => {
