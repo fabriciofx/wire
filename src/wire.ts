@@ -1,11 +1,11 @@
 import type { Headers } from './headers.ts';
 import type { Response } from './response.ts';
 
-export interface Params<T> {
+export type Params<T> = {
   method: string;
   headers: Headers;
   payload?: T;
-}
+};
 
 export interface Wire<X, Y> {
   send(url: string, params: Params<X>): Promise<Response<Y>>;
