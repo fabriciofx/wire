@@ -5,16 +5,11 @@ const USERS = [
   { id: 2, name: 'Bruno' }
 ];
 
-export function usersAction(req: Request): Promise<Response> {
+export function usersGetAction(req: Request): Response {
   if (authorized(req)) {
-    return new Promise<Response>((resolve) =>
-      resolve(new Response(JSON.stringify(USERS), { status: 201 }))
-    );
-  } else {
-    return new Promise<Response>((resolve) =>
-      resolve(new Response('Unauthorized', { status: 401 }))
-    );
+    return Response.json(USERS, { status: 201 });
   }
+  return Response.json('Unauthorized', { status: 401 });
 }
 
 export function usersDeleteAction(req: Request): Response {

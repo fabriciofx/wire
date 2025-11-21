@@ -1,5 +1,5 @@
 import { loginAction } from './login.ts';
-import { usersAction, usersDeleteAction } from './users.ts';
+import { usersDeleteAction, usersGetAction } from './users.ts';
 
 export interface Server {
   start(): void;
@@ -25,7 +25,7 @@ async function actions(req: Request): Promise<Response> {
   if (req.method === 'POST' && url.pathname === '/login') {
     return await loginAction(req);
   } else if (req.method === 'GET' && url.pathname === '/users') {
-    return await usersAction(req);
+    return usersGetAction(req);
   } else if (req.method === 'DELETE' && /^\/users\/\d+$/.test(url.pathname)) {
     return usersDeleteAction(req);
   }
