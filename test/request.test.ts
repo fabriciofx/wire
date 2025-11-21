@@ -36,8 +36,8 @@ Deno.test('Must do a simple get request', async () => {
   const response = await new Get<DogResponse>(
     'https://api.thedogapi.com/v1'
   ).send();
-  assertEquals(response.status(), 200);
-  assertEquals(response.data().message, 'The Dog API');
+  assertEquals(response.status, 200);
+  assertEquals(response.data.message, 'The Dog API');
 });
 
 Deno.test('Must do an authenticated get request', async () => {
@@ -45,8 +45,8 @@ Deno.test('Must do an authenticated get request', async () => {
     new Get<DogResponse>('https://api.thedogapi.com/v1'),
     config.THEDOGAPI_TOKEN
   ).send();
-  assertEquals(response.status(), 200);
-  assertEquals(response.data().message, 'The Dog API');
+  assertEquals(response.status, 200);
+  assertEquals(response.data.message, 'The Dog API');
 });
 
 Deno.test('Must do an authenticated post request', async () => {
@@ -58,8 +58,8 @@ Deno.test('Must do an authenticated post request', async () => {
     new Post<Vote, VoteResponse>('https://api.thedogapi.com/v1/votes', vote),
     config.THEDOGAPI_TOKEN
   ).send();
-  assertEquals(response.status(), 201);
-  assertEquals(response.data().message, 'SUCCESS');
+  assertEquals(response.status, 201);
+  assertEquals(response.data.message, 'SUCCESS');
 });
 
 Deno.test('Must authenticated with credentials', async () => {
@@ -77,9 +77,9 @@ Deno.test('Must authenticated with credentials', async () => {
   ).send();
   const users = await new Authenticated(
     new Get<User[]>('http://localhost:8000/users'),
-    tokens.data()
+    tokens.data
   ).send();
-  assertEquals(users.data(), [
+  assertEquals(users.data, [
     { id: 1, name: 'Ana' },
     { id: 2, name: 'Bruno' }
   ]);
