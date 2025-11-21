@@ -1,22 +1,22 @@
-import { ContentType, type Header } from './header.ts';
+import type { Header } from './header.ts';
 import { Headers } from './headers.ts';
 import type { Response } from './response.ts';
 import { FetchWire, type Wire } from './wire.ts';
 
-export interface Request<T> {
+export interface Request {
   with(header: Header): void;
-  send(): Promise<Response<T>>;
+  send(): Promise<Response>;
 }
 
-export class Get<T> implements Request<T> {
+export class Get implements Request {
   private readonly url: string;
   private readonly headers: Headers;
-  private readonly wire: Wire<T, T>;
+  private readonly wire: Wire<void>;
 
   constructor(
     url: string,
     headers: Headers = new Headers(),
-    wire: Wire<T, T> = new FetchWire<T, T>()
+    wire: Wire<void> = new FetchWire<void>()
   ) {
     this.url = url;
     this.headers = headers;
@@ -27,7 +27,7 @@ export class Get<T> implements Request<T> {
     this.headers.add(header);
   }
 
-  send(): Promise<Response<T>> {
+  send(): Promise<Response> {
     return this.wire.send(this.url, {
       method: 'GET',
       headers: this.headers
@@ -35,17 +35,17 @@ export class Get<T> implements Request<T> {
   }
 }
 
-export class Post<X, Y> implements Request<Y> {
+export class Post<T> implements Request {
   private readonly url: string;
-  private readonly payload: X;
+  private readonly payload: T;
   private readonly headers: Headers;
-  private readonly wire: Wire<X, Y>;
+  private readonly wire: Wire<T>;
 
   constructor(
     url: string,
-    payload: X,
+    payload: T,
     headers: Headers = new Headers(),
-    wire: Wire<X, Y> = new FetchWire<X, Y>()
+    wire: Wire<T> = new FetchWire<T>()
   ) {
     this.url = url;
     this.payload = payload;
@@ -57,8 +57,7 @@ export class Post<X, Y> implements Request<Y> {
     this.headers.add(header);
   }
 
-  send(): Promise<Response<Y>> {
-    this.with(new ContentType('application/json'));
+  send(): Promise<Response> {
     return this.wire.send(this.url, {
       method: 'POST',
       headers: this.headers,
@@ -67,15 +66,15 @@ export class Post<X, Y> implements Request<Y> {
   }
 }
 
-export class Delete<T> implements Request<T> {
+export class Delete implements Request {
   private readonly url: string;
   private readonly headers: Headers;
-  private readonly wire: Wire<T, T>;
+  private readonly wire: Wire<void>;
 
   constructor(
     url: string,
     headers: Headers = new Headers(),
-    wire: Wire<T, T> = new FetchWire<T, T>()
+    wire: Wire<void> = new FetchWire<void>()
   ) {
     this.url = url;
     this.headers = headers;
@@ -86,7 +85,7 @@ export class Delete<T> implements Request<T> {
     this.headers.add(header);
   }
 
-  send(): Promise<Response<T>> {
+  send(): Promise<Response> {
     return this.wire.send(this.url, {
       method: 'DELETE',
       headers: this.headers

@@ -7,12 +7,12 @@ export type Params<T> = {
   payload?: T;
 };
 
-export interface Wire<X, Y> {
-  send(url: string, params: Params<X>): Promise<Response<Y>>;
+export interface Wire<T> {
+  send(url: string, params: Params<T>): Promise<Response>;
 }
 
-export class FetchWire<X, Y> implements Wire<X, Y> {
-  async send(url: string, params: Params<X>): Promise<Response<Y>> {
+export class FetchWire<T> implements Wire<T> {
+  async send(url: string, params: Params<T>): Promise<Response> {
     try {
       const init: RequestInit = {
         method: params.method,
@@ -25,8 +25,8 @@ export class FetchWire<X, Y> implements Wire<X, Y> {
       if (!response.ok) {
         throw new Error(`(${response.status}) ${response.statusText}`);
       }
-      const data = (await response.json()) as Y;
-      return { data: data, status: response.status };
+      const bytes = await response.bytes();
+      return { bytes: bytes, status: response.status };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(message);

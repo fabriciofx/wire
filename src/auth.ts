@@ -12,11 +12,11 @@ export type AuthTokens = {
   refresh: string;
 };
 
-export class Authenticated<T> implements Request<T> {
-  private readonly origin: Request<T>;
+export class Authenticated implements Request {
+  private readonly origin: Request;
   private readonly tokens: AuthTokens;
 
-  constructor(request: Request<T>, tokens: AuthTokens) {
+  constructor(request: Request, tokens: AuthTokens) {
     this.origin = request;
     this.tokens = tokens;
   }
@@ -25,18 +25,18 @@ export class Authenticated<T> implements Request<T> {
     this.origin.with(header);
   }
 
-  send(): Promise<Response<T>> {
+  send(): Promise<Response> {
     this.with(new ContentType('application/json'));
     this.with(new BearerAuth(this.tokens.access));
     return this.origin.send();
   }
 }
 
-export class AuthWithToken<T> implements Request<T> {
-  private readonly origin: Request<T>;
+export class AuthWithToken implements Request {
+  private readonly origin: Request;
   private readonly token: string;
 
-  constructor(request: Request<T>, token: string) {
+  constructor(request: Request, token: string) {
     this.origin = request;
     this.token = token;
   }
@@ -45,7 +45,7 @@ export class AuthWithToken<T> implements Request<T> {
     this.origin.with(header);
   }
 
-  send(): Promise<Response<T>> {
+  send(): Promise<Response> {
     this.with(new ContentType('application/json'));
     this.with(new XapiAuth(this.token));
     return this.origin.send();
