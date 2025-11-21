@@ -13,6 +13,9 @@ export function usersGetAction(req: Request): Response {
 }
 
 export function usersDeleteAction(req: Request): Response {
+  if (!authorized(req)) {
+    return Response.json('Unauthorized', { status: 401 });
+  }
   const match = /\/users\/(\d+)$/.exec(req.url);
   if (!match) {
     return Response.json('Bad request: URL invalid.', { status: 400 });
