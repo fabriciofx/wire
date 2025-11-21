@@ -1,5 +1,5 @@
 import { loginAction } from './login.ts';
-import { usersAction } from './users.ts';
+import { usersAction, usersDeleteAction } from './users.ts';
 
 export interface Server {
   start(): void;
@@ -26,6 +26,8 @@ async function actions(req: Request): Promise<Response> {
     return await loginAction(req);
   } else if (req.method === 'GET' && url.pathname === '/users') {
     return await usersAction(req);
+  } else if (req.method === 'DELETE' && /^\/users\/\d+$/.test(url.pathname)) {
+    return usersDeleteAction(req);
   }
   if (url.pathname !== '/') {
     return new Response('Endpoint not found.', { status: 404 });

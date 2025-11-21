@@ -66,3 +66,30 @@ export class Post<X, Y> implements Request<Y> {
     });
   }
 }
+
+export class Delete<T> implements Request<T> {
+  private readonly url: string;
+  private readonly headers: Headers;
+  private readonly wire: Wire<T, T>;
+
+  constructor(
+    url: string,
+    headers: Headers = new Headers(),
+    wire: Wire<T, T> = new FetchWire<T, T>()
+  ) {
+    this.url = url;
+    this.headers = headers;
+    this.wire = wire;
+  }
+
+  with(header: Header): void {
+    this.headers.add(header);
+  }
+
+  send(): Promise<Response<T>> {
+    return this.wire.send(this.url, {
+      method: 'DELETE',
+      headers: this.headers
+    });
+  }
+}

@@ -5,7 +5,7 @@ import {
   AuthWithToken,
   type Credentials
 } from '../src/auth.ts';
-import { Get, Post } from '../src/request.ts';
+import { Delete, Get, Post } from '../src/request.ts';
 import * as config from './config.ts';
 import { FakeHttpServer } from './server/server.ts';
 
@@ -81,5 +81,25 @@ Deno.test('Must authenticated with credentials', async () => {
     { id: 1, name: 'Ana' },
     { id: 2, name: 'Bruno' }
   ]);
+  server.stop();
+});
+
+Deno.test('Must delete a user', async () => {
+  const server = new FakeHttpServer(8000);
+  server.start();
+  const credentials: Credentials = {
+    username: 'admin',
+    password: '12345678'
+  };
+  const tokens = await new Post<Credentials, AuthTokens>(
+    'http://localhost:8000/login',
+    credentials
+  ).send();
+  const response = await new Authenticated(
+    new Delete<string>('http://localhost:8000/users/1'),
+    tokens.data
+  ).send();
+  assertEquals(response.status, 200);
+  assertEquals(response.data, 'User Ana deleted with success.');
   server.stop();
 });

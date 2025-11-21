@@ -29,7 +29,7 @@ export class FetchWire<X, Y> implements Wire<X, Y> {
       return { data: data, status: response.status };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      throw new Error(`Error sending a request: ${message}`);
+      throw new Error(message);
     }
   }
 }
