@@ -58,27 +58,11 @@ export class Post<X, Y> implements Request<Y> {
   }
 
   send(): Promise<Response<Y>> {
+    this.with(new ContentType('application/json'));
     return this.wire.send(this.url, {
       method: 'POST',
       headers: this.headers,
       payload: this.payload
     });
-  }
-}
-
-export class AsJson<T> implements Request<T> {
-  private readonly origin: Request<T>;
-
-  constructor(request: Request<T>) {
-    this.origin = request;
-  }
-
-  with(header: Header): void {
-    this.origin.with(header);
-  }
-
-  send(): Promise<Response<T>> {
-    this.with(new ContentType('application/json'));
-    return this.origin.send();
   }
 }

@@ -5,7 +5,7 @@ import {
   AuthWithToken,
   type Credentials
 } from '../src/auth.ts';
-import { AsJson, Get, Post } from '../src/request.ts';
+import { Get, Post } from '../src/request.ts';
 import * as config from './config.ts';
 import { FakeHttpServer } from './server/server.ts';
 
@@ -69,11 +69,9 @@ Deno.test('Must authenticated with credentials', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const tokens = await new AsJson(
-    new Post<Credentials, AuthTokens>(
-      'http://localhost:8000/login',
-      credentials
-    )
+  const tokens = await new Post<Credentials, AuthTokens>(
+    'http://localhost:8000/login',
+    credentials
   ).send();
   const users = await new Authenticated(
     new Get<User[]>('http://localhost:8000/users'),
