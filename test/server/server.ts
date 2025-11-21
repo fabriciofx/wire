@@ -30,9 +30,9 @@ async function actions(req: Request): Promise<Response> {
     return usersDeleteAction(req);
   }
   if (url.pathname !== '/') {
-    return new Response('Endpoint not found.', { status: 404 });
+    return Response.json('Endpoint not found.', { status: 404 });
   }
-  return new Response(
+  return Response.json(
     `Request to ${url.pathname} using ${req.method} method not found.`,
     { status: 200 }
   );
