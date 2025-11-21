@@ -1,7 +1,13 @@
 import { assertEquals } from '@std/assert';
-import { AuthWithToken } from '../src/auth.ts';
-import { Get, Post } from '../src/request.ts';
+import {
+  Authenticated,
+  type AuthTokens,
+  AuthWithToken,
+  type Credentials
+} from '../src/auth.ts';
+import { AsJson, Get, Post } from '../src/request.ts';
 import * as config from './config.ts';
+import { FakeHttpServer } from './server/server.ts';
 
 type DogResponse = {
   message: string;
@@ -19,6 +25,11 @@ type VoteResponse = {
   image_id: string;
   value: number;
   country_code: string;
+};
+
+type User = {
+  id: number;
+  name: string;
 };
 
 Deno.test('Must do a simple get request', async () => {
@@ -49,4 +60,28 @@ Deno.test('Must do an authenticated post request', async () => {
   ).send();
   assertEquals(response.status(), 201);
   assertEquals(response.data().message, 'SUCCESS');
+});
+
+Deno.test('Must authenticated with credentials', async () => {
+  const server = new FakeHttpServer(8000);
+  server.start();
+  const credentials: Credentials = {
+    username: 'admin',
+    password: '12345678'
+  };
+  const tokens = await new AsJson(
+    new Post<Credentials, AuthTokens>(
+      'http://localhost:8000/login',
+      credentials
+    )
+  ).send();
+  const users = await new Authenticated(
+    new Get<User[]>('http://localhost:8000/users'),
+    tokens.data()
+  ).send();
+  assertEquals(users.data(), [
+    { id: 1, name: 'Ana' },
+    { id: 2, name: 'Bruno' }
+  ]);
+  server.stop();
 });

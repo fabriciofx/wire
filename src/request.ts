@@ -1,4 +1,4 @@
-import type { Header } from './header.ts';
+import { ContentType, type Header } from './header.ts';
 import { Headers } from './headers.ts';
 import type { Response } from './response.ts';
 import { FetchWire, type Wire } from './wire.ts';
@@ -63,5 +63,22 @@ export class Post<X, Y> implements Request<Y> {
       headers: this.headers,
       payload: this.payload
     });
+  }
+}
+
+export class AsJson<T> implements Request<T> {
+  private readonly origin: Request<T>;
+
+  constructor(request: Request<T>) {
+    this.origin = request;
+  }
+
+  with(header: Header): void {
+    this.origin.with(header);
+  }
+
+  send(): Promise<Response<T>> {
+    this.with(new ContentType('application/json'));
+    return this.origin.send();
   }
 }

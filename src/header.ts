@@ -34,3 +34,19 @@ export class XapiAuth implements Header {
     return this.token;
   }
 }
+
+export class BearerAuth implements Header {
+  private readonly token: string;
+
+  constructor(token: string) {
+    this.token = token;
+  }
+
+  name(): string {
+    return 'Authorization';
+  }
+
+  value(): string {
+    return `Bearer ${this.token}`;
+  }
+}
