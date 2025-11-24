@@ -8,7 +8,7 @@ import {
 import { File, Json } from '../src/content.ts';
 import { FormPayload, JpegPayload, JsonPayload } from '../src/payload.ts';
 import { Delete, Get, Post } from '../src/request.ts';
-import * as config from './config.ts';
+import { env } from './config.ts';
 import { FakeHttpServer } from './server/server.ts';
 
 type DogResponse = {
@@ -52,6 +52,7 @@ Deno.test('Must do a simple get request', async () => {
 });
 
 Deno.test('Must do an authenticated get request', async () => {
+  const config = await env();
   const response = await new Json<DogResponse>(
     new AuthWithToken(
       new Get('https://api.thedogapi.com/v1'),
@@ -62,6 +63,7 @@ Deno.test('Must do an authenticated get request', async () => {
 });
 
 Deno.test('Must do an authenticated post request', async () => {
+  const config = await env();
   const vote: Vote = {
     image_id: 'BJa4kxc4X',
     value: 1
@@ -132,6 +134,7 @@ Deno.test('Must download and save an image', async () => {
 });
 
 Deno.test('Must upload an image', async () => {
+  const config = await env();
   const blackDog = await Deno.readFile('./test/resources/black-dog.jpg');
   const response = await new Json<UploadResponse>(
     new AuthWithToken(

@@ -1,7 +1,11 @@
-import { load } from "std/dotenv";
+import { dirname, fromFileUrl, join } from '@std/path';
+import { load } from 'std/dotenv';
 
-// Load environment test variables
-const env = await load({ envPath: "./test/.env.test"});
-
-// Set environment test variables
-export const THEDOGAPI_TOKEN = env.THEDOGAPI_TOKEN!;
+export async function env() {
+  const dir = dirname(fromFileUrl(import.meta.url));
+  const envFile = join(dir, '.env.test');
+  const env = await load({ envPath: envFile });
+  return {
+    THEDOGAPI_TOKEN: env.THEDOGAPI_TOKEN || ''
+  };
+}
