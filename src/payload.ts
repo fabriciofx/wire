@@ -57,17 +57,37 @@ export class JpegPayload implements Payload {
   }
 }
 
+class Boundary {
+  private readonly hash: string;
+
+  constructor(size: number) {
+    const numbers: string[] = [];
+    for (let idx = 0; idx < size; idx++) {
+      numbers.push(String(Math.floor(Math.random() * 9000) + 1000));
+    }
+    this.hash = `----${numbers.join('')}`;
+  }
+
+  value(): string {
+    return this.hash;
+  }
+
+  begin(): string {
+    return `--${this.hash}`;
+  }
+
+  end(): string {
+    return `--${this.hash}--`;
+  }
+}
+
 export class FormPayload implements Payload {
   private readonly payload: Payload;
-  private readonly boundary: string;
+  private readonly boundary: Boundary;
 
   constructor(payload: Payload) {
     this.payload = payload;
-    const numeros: string[] = [];
-    for (let idx = 0; idx < 7; idx++) {
-      numeros.push(String(Math.floor(Math.random() * 9000) + 1000));
-    }
-    this.boundary = `----${numeros.join('')}`;
+    this.boundary = new Boundary(7);
   }
 
   bytes(): Uint8Array<ArrayBuffer> {
@@ -79,7 +99,7 @@ export class FormPayload implements Payload {
         ['filename', 'black-dog.jpg']
       ])
     );
-    chunks.push(encoder.encode(`--${this.boundary}`));
+    chunks.push(encoder.encode(this.boundary.begin()));
     // biome-ignore format: the line below needs double quotes.
     chunks.push(encoder.encode("\r\n"));
     chunks.push(encoder.encode(disposition.asString()));
@@ -91,7 +111,7 @@ export class FormPayload implements Payload {
     chunks.push(this.payload.bytes());
     // biome-ignore format: the line below needs double quotes.
     chunks.push(encoder.encode("\r\n"));
-    chunks.push(encoder.encode(`--${this.boundary}--`));
+    chunks.push(encoder.encode(this.boundary.end()));
     const length = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
     const result = new Uint8Array(length);
     let offset = 0;
@@ -108,6 +128,8 @@ export class FormPayload implements Payload {
   }
 
   type(): Header {
-    return new ContentType(`multipart/form-data; boundary=${this.boundary}`);
+    return new ContentType(
+      `multipart/form-data; boundary=${this.boundary.value()}`
+    );
   }
 }
