@@ -1,4 +1,5 @@
 import { loginAction } from './login.ts';
+import { uploadAction } from './upload.ts';
 import { usersDeleteAction, usersGetAction } from './users.ts';
 
 export interface Server {
@@ -28,6 +29,8 @@ async function actions(req: Request): Promise<Response> {
     return usersGetAction(req);
   } else if (req.method === 'DELETE' && /^\/users\/\d+$/.test(url.pathname)) {
     return usersDeleteAction(req);
+  } else if (req.method === 'POST' && '/upload') {
+    return uploadAction(req);
   }
   if (url.pathname !== '/') {
     return Response.json('Endpoint not found.', { status: 404 });

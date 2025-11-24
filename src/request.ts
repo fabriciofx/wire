@@ -1,5 +1,6 @@
 import type { Header } from './header.ts';
 import { Headers } from './headers.ts';
+import type { Payload } from './payload.ts';
 import type { Response } from './response.ts';
 import { FetchWire, type Wire } from './wire.ts';
 
@@ -11,12 +12,12 @@ export interface Request {
 export class Get implements Request {
   private readonly url: string;
   private readonly headers: Headers;
-  private readonly wire: Wire<void>;
+  private readonly wire: Wire;
 
   constructor(
     url: string,
     headers: Headers = new Headers(),
-    wire: Wire<void> = new FetchWire<void>()
+    wire: Wire = new FetchWire()
   ) {
     this.url = url;
     this.headers = headers;
@@ -35,17 +36,17 @@ export class Get implements Request {
   }
 }
 
-export class Post<T> implements Request {
+export class Post implements Request {
   private readonly url: string;
-  private readonly payload: T;
+  private readonly payload: Payload;
   private readonly headers: Headers;
-  private readonly wire: Wire<T>;
+  private readonly wire: Wire;
 
   constructor(
     url: string,
-    payload: T,
+    payload: Payload,
     headers: Headers = new Headers(),
-    wire: Wire<T> = new FetchWire<T>()
+    wire: Wire = new FetchWire()
   ) {
     this.url = url;
     this.payload = payload;
@@ -57,10 +58,10 @@ export class Post<T> implements Request {
     this.headers.add(header);
   }
 
-  send(): Promise<Response> {
+  async send(): Promise<Response> {
     return this.wire.send(this.url, {
       method: 'POST',
-      headers: this.headers,
+      headers: await this.payload.headers(this.headers),
       payload: this.payload
     });
   }
@@ -69,12 +70,12 @@ export class Post<T> implements Request {
 export class Delete implements Request {
   private readonly url: string;
   private readonly headers: Headers;
-  private readonly wire: Wire<void>;
+  private readonly wire: Wire;
 
   constructor(
     url: string,
     headers: Headers = new Headers(),
-    wire: Wire<void> = new FetchWire<void>()
+    wire: Wire = new FetchWire()
   ) {
     this.url = url;
     this.headers = headers;
