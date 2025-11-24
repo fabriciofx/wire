@@ -58,10 +58,10 @@ export class Post implements Request {
     this.headers.add(header);
   }
 
-  async send(): Promise<Response> {
+  send(): Promise<Response> {
     return this.wire.send(this.url, {
       method: 'POST',
-      headers: await this.payload.headers(this.headers),
+      headers: this.payload.headers(this.headers),
       payload: this.payload
     });
   }
