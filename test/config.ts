@@ -1,5 +1,5 @@
+import { load } from '@std/dotenv';
 import { dirname, fromFileUrl, join } from '@std/path';
-import { load } from 'std/dotenv';
 
 export async function env() {
   const dir = dirname(fromFileUrl(import.meta.url));

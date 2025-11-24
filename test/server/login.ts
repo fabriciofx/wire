@@ -1,5 +1,5 @@
-import * as jwt from 'std/djwt';
-import { create as createJwt } from 'std/djwt';
+import * as jwt from '@zaubrik/djwt';
+import { create } from '@zaubrik/djwt';
 import type { AuthTokens, Credentials } from '../../src/auth.ts';
 
 const SECRET_KEY = await crypto.subtle.generateKey(
@@ -16,7 +16,7 @@ async function token(key: CryptoKey, username: string, hours: number) {
     userId: Date.now(),
     username: username
   };
-  return await createJwt({ alg: 'HS512', typ: 'JWT' }, payload, key);
+  return await create({ alg: 'HS512', typ: 'JWT' }, payload, key);
 }
 
 async function login(credentials: Credentials): Promise<AuthTokens> {
