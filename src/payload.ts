@@ -1,9 +1,15 @@
-import { ContentDiposition, ContentLength, ContentType } from './header.ts';
+import {
+  ContentDiposition,
+  ContentLength,
+  ContentType,
+  type Header
+} from './header.ts';
 import type { Headers } from './headers.ts';
 
 export interface Payload {
   bytes(): Uint8Array<ArrayBuffer>;
   headers(hdrs: Headers): Headers;
+  type(): Header;
 }
 
 export class JsonPayload<T> implements Payload {
@@ -20,8 +26,12 @@ export class JsonPayload<T> implements Payload {
   }
 
   headers(hdrs: Headers): Headers {
-    hdrs.add(new ContentType('application/json'));
+    hdrs.add(this.type());
     return hdrs;
+  }
+
+  type(): Header {
+    return new ContentType('application/json');
   }
 }
 
@@ -37,9 +47,13 @@ export class JpegPayload implements Payload {
   }
 
   headers(hdrs: Headers): Headers {
-    hdrs.add(new ContentType('image/jpeg'));
+    hdrs.add(this.type());
     hdrs.add(new ContentLength(this.content.length));
     return hdrs;
+  }
+
+  type(): Header {
+    return new ContentType('image/jpeg');
   }
 }
 
@@ -65,14 +79,13 @@ export class FormPayload implements Payload {
         ['filename', 'black-dog.jpg']
       ])
     );
-    const content = new ContentType('image/jpeg');
     chunks.push(encoder.encode(`--${this.boundary}`));
     // biome-ignore format: the line below needs double quotes.
     chunks.push(encoder.encode("\r\n"));
     chunks.push(encoder.encode(disposition.asString()));
     // biome-ignore format: the line below needs double quotes.
     chunks.push(encoder.encode("\r\n"));
-    chunks.push(encoder.encode(content.asString()));
+    chunks.push(encoder.encode(this.payload.type().asString()));
     // biome-ignore format: the line below needs double quotes.
     chunks.push(encoder.encode("\r\n\r\n"));
     chunks.push(this.payload.bytes());
@@ -90,7 +103,11 @@ export class FormPayload implements Payload {
   }
 
   headers(hdrs: Headers): Headers {
-    hdrs.add(new ContentType(`multipart/form-data; boundary=${this.boundary}`));
+    hdrs.add(this.type());
     return hdrs;
+  }
+
+  type(): Header {
+    return new ContentType(`multipart/form-data; boundary=${this.boundary}`);
   }
 }
