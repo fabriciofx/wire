@@ -1,6 +1,7 @@
 export interface Header {
   name(): string;
   value(): string;
+  asString(): string;
 }
 
 export class ContentType implements Header {
@@ -16,6 +17,10 @@ export class ContentType implements Header {
 
   value(): string {
     return this.type;
+  }
+
+  asString(): string {
+    return `${this.name()}: ${this.value()}`;
   }
 }
 
@@ -33,6 +38,10 @@ export class XapiAuth implements Header {
   value(): string {
     return this.token;
   }
+
+  asString(): string {
+    return `${this.name()}: ${this.value()}`;
+  }
 }
 
 export class BearerAuth implements Header {
@@ -48,6 +57,10 @@ export class BearerAuth implements Header {
 
   value(): string {
     return `Bearer ${this.token}`;
+  }
+
+  asString(): string {
+    return `${this.name()}: ${this.value()}`;
   }
 }
 
@@ -65,6 +78,10 @@ export class ContentLength implements Header {
   value(): string {
     return String(this.length);
   }
+
+  asString(): string {
+    return `${this.name()}: ${this.value()}`;
+  }
 }
 
 export class AcceptEncoding implements Header {
@@ -81,6 +98,10 @@ export class AcceptEncoding implements Header {
   value(): string {
     return this.encoding;
   }
+
+  asString(): string {
+    return `${this.name()}: ${this.value()}`;
+  }
 }
 
 export class AcceptLanguage implements Header {
@@ -96,6 +117,10 @@ export class AcceptLanguage implements Header {
 
   value(): string {
     return this.language;
+  }
+
+  asString(): string {
+    return `${this.name()}: ${this.value()}`;
   }
 }
 
@@ -115,5 +140,9 @@ export class ContentDiposition implements Header {
       .map(([key, value]) => `${key}="${value}"`)
       .join('; ');
     return `form-data; ${data}`;
+  }
+
+  asString(): string {
+    return `${this.name()}: ${this.value()}`;
   }
 }

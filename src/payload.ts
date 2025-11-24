@@ -69,12 +69,10 @@ export class FormPayload implements Payload {
     chunks.push(encoder.encode(`--${this.boundary}`));
     // biome-ignore format: the line below needs double quotes.
     chunks.push(encoder.encode("\r\n"));
-    chunks.push(
-      encoder.encode(`${disposition.name()}: ${disposition.value()}`)
-    );
+    chunks.push(encoder.encode(disposition.asString()));
     // biome-ignore format: the line below needs double quotes.
     chunks.push(encoder.encode("\r\n"));
-    chunks.push(encoder.encode(`${content.name()}: ${content.value()}`));
+    chunks.push(encoder.encode(content.asString()));
     // biome-ignore format: the line below needs double quotes.
     chunks.push(encoder.encode("\r\n\r\n"));
     chunks.push(this.payload.bytes());
