@@ -10,7 +10,7 @@ const config = await env();
 const response = await new AuthWithToken(
   new Post(
     'https://api.thedogapi.com/v1/images/upload',
-    new FormPayload(new JpegPayload(bytes))
+    new FormPayload(['file', new JpegPayload(bytes)])
   ),
   config.THEDOGAPI_TOKEN
 ).send();

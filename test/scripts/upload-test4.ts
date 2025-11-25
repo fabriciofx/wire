@@ -16,7 +16,10 @@ const response = await new Json<string>(
   new AuthWithToken(
     new Post(
       'http://localhost:8080/upload',
-      new FormPayload(new JpegPayload(bytes))
+      new FormPayload([
+        'file',
+        new JpegPayload(bytes, ['filename', 'mini-black-dog.jpg'])
+      ])
     ),
     config.THEDOGAPI_TOKEN
   )
