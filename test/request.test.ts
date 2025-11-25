@@ -140,7 +140,10 @@ Deno.test('Must upload an image', async () => {
     new AuthWithToken(
       new Post(
         'https://api.thedogapi.com/v1/images/upload',
-        new FormPayload(new JpegPayload(blackDog))
+        new FormPayload([
+          'file',
+          new JpegPayload(blackDog, ['filename', 'black-dog.jpg'])
+        ])
       ),
       config.THEDOGAPI_TOKEN
     )

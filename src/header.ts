@@ -125,9 +125,9 @@ export class AcceptLanguage implements Header {
 }
 
 export class ContentDiposition implements Header {
-  private readonly entries: Map<string, string>;
+  private readonly entries: [string, string][];
 
-  constructor(entries: Map<string, string>) {
+  constructor(entries: [string, string][]) {
     this.entries = entries;
   }
 
@@ -136,7 +136,7 @@ export class ContentDiposition implements Header {
   }
 
   value(): string {
-    const data = Array.from(this.entries)
+    const data = this.entries
       .map(([key, value]) => `${key}="${value}"`)
       .join('; ');
     return `form-data; ${data}`;
