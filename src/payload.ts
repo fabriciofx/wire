@@ -6,7 +6,7 @@ import {
   ContentType,
   type Header
 } from './header.ts';
-import type { Headers } from './headers.ts';
+import { Headers } from './headers.ts';
 
 export interface Payload extends Content<Uint8Array<ArrayBuffer>> {
   headers(hdrs: Headers): Headers;
@@ -27,8 +27,7 @@ export class TextPayload implements Payload {
   }
 
   headers(hdrs: Headers): Headers {
-    hdrs.add(this.type());
-    return hdrs;
+    return new Headers(...hdrs.items(), this.type());
   }
 
   type(): Header {
@@ -54,8 +53,7 @@ export class JsonPayload<T> implements Payload {
   }
 
   headers(hdrs: Headers): Headers {
-    hdrs.add(this.type());
-    return hdrs;
+    return new Headers(...hdrs.items(), this.type());
   }
 
   type(): Header {
@@ -81,9 +79,11 @@ export class JpegPayload implements Payload {
   }
 
   headers(hdrs: Headers): Headers {
-    hdrs.add(this.type());
-    hdrs.add(new ContentLength(this.content.length));
-    return hdrs;
+    return new Headers(
+      ...hdrs.items(),
+      this.type(),
+      new ContentLength(this.content.length)
+    );
   }
 
   type(): Header {
@@ -157,8 +157,7 @@ export class FormPayload implements Payload {
   }
 
   headers(hdrs: Headers): Headers {
-    hdrs.add(this.type());
-    return hdrs;
+    return new Headers(...hdrs.items(), this.type());
   }
 
   type(): Header {

@@ -1,22 +1,22 @@
 import type { Header } from './header.ts';
 
 export class Headers {
-  private readonly items: Header[];
+  private readonly list: Header[];
 
   constructor(...items: Header[]) {
-    this.items = items;
+    this.list = items;
   }
 
-  count(): number {
-    return this.items.length;
+  items(): Header[] {
+    return this.list;
   }
 
   add(header: Header) {
-    this.items.push(header);
+    this.list.push(header);
   }
 
   records(): Record<string, string> {
-    return this.items.reduce(
+    return this.list.reduce(
       (acc, header) => {
         acc[header.name()] = header.value();
         return acc;
