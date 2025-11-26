@@ -1,6 +1,10 @@
 import { loginAction } from './login.ts';
 import { uploadAction } from './upload.ts';
-import { usersDeleteAction, usersGetAction } from './users.ts';
+import {
+  usersChangeAction,
+  usersDeleteAction,
+  usersGetAction
+} from './users.ts';
 
 export interface Server {
   start(): void;
@@ -29,6 +33,8 @@ async function actions(req: Request): Promise<Response> {
     return usersGetAction(req);
   } else if (req.method === 'DELETE' && /^\/users\/\d+$/.test(url.pathname)) {
     return usersDeleteAction(req);
+  } else if (req.method === 'PUT' && /^\/users\/\d+$/.test(url.pathname)) {
+    return usersChangeAction(req);
   } else if (req.method === 'POST' && '/upload') {
     return uploadAction(req);
   }

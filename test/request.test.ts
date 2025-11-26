@@ -7,7 +7,7 @@ import {
 } from '../src/auth.ts';
 import { File, Json } from '../src/content.ts';
 import { FormPayload, JpegPayload, JsonPayload } from '../src/payload.ts';
-import { Delete, Get, Post } from '../src/request.ts';
+import { Delete, Get, Post, Put } from '../src/request.ts';
 import { env } from './config.ts';
 import { FakeHttpServer } from './server/server.ts';
 
@@ -153,4 +153,33 @@ Deno.test('Must upload an image', async () => {
   assertEquals(response.original_filename, 'black-dog.jpg');
   assertEquals(response.pending, 0);
   assertEquals(response.approved, 1);
+});
+
+Deno.test('Must change a user name', async () => {
+  const server = new FakeHttpServer(8000);
+  server.start();
+  const credentials: Credentials = {
+    username: 'admin',
+    password: '12345678'
+  };
+  const tokens = await new Json<AuthTokens>(
+    new Post(
+      'http://localhost:8000/login',
+      new JsonPayload<Credentials>(credentials)
+    )
+  ).content();
+  const response = await new Json<string>(
+    new Authenticated(
+      new Put(
+        'http://localhost:8000/users/1',
+        new JsonPayload<User>({ id: 1, name: 'Amanda' })
+      ),
+      tokens
+    )
+  ).content();
+  assertEquals(
+    response,
+    'User  id: 1, name: Amanda id: 2, name: Bruno changed with success.'
+  );
+  server.stop();
 });

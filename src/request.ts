@@ -93,3 +93,34 @@ export class Delete implements Request {
     });
   }
 }
+
+export class Put implements Request {
+  private readonly url: string;
+  private readonly payload: Payload;
+  private readonly headers: Headers;
+  private readonly wire: Wire;
+
+  constructor(
+    url: string,
+    payload: Payload,
+    headers: Headers = new Headers(),
+    wire: Wire = new FetchWire()
+  ) {
+    this.url = url;
+    this.payload = payload;
+    this.headers = headers;
+    this.wire = wire;
+  }
+
+  with(header: Header): void {
+    this.headers.add(header);
+  }
+
+  send(): Promise<Response> {
+    return this.wire.send(this.url, {
+      method: 'PUT',
+      headers: this.payload.headers(this.headers),
+      payload: this.payload
+    });
+  }
+}
