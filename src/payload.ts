@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import type { Adapter } from './content.ts';
 import {
   ContentDiposition,
@@ -150,27 +151,12 @@ export class FormPayload implements Payload {
       chunks.push(await payload.adapt());
       // biome-ignore format: the line below needs double quotes.
       chunks.push(encoder.encode("\r\n"));
-      const length = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-      const content = new Uint8Array(length);
-      let offset = 0;
-      for (const chunk of chunks) {
-        content.set(chunk, offset);
-        offset += chunk.length;
-      }
-      return content;
+      return Buffer.concat(chunks);
     });
-    const resolved = await Promise.all(contents);
-    const total =
-      resolved.reduce((acc, content) => acc + content.length, 0) +
-      this.boundary.end().length;
-    const result = new Uint8Array(total);
-    let offset = 0;
-    for (const content of resolved) {
-      result.set(content, offset);
-      offset += content.length;
-    }
-    result.set(encoder.encode(this.boundary.end()), offset);
-    return Promise.resolve(result);
+    return Buffer.concat([
+      ...(await Promise.all(contents)),
+      Buffer.from(this.boundary.end())
+    ]);
   }
 
   headers(hdrs: Headers): Headers {
