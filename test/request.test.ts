@@ -5,7 +5,7 @@ import {
   AuthWithToken,
   type Credentials
 } from '../src/auth.ts';
-import { File, Json } from '../src/content.ts';
+import { FileContent, JsonContent } from '../src/content.ts';
 import { FormPayload, JpegPayload, JsonPayload } from '../src/payload.ts';
 import { Delete, Get, Post, Put } from '../src/request.ts';
 import { env } from './config.ts';
@@ -45,7 +45,7 @@ type UploadResponse = {
 };
 
 Deno.test('Must do a simple get request', async () => {
-  const response = await new Json<DogResponse>(
+  const response = await new JsonContent<DogResponse>(
     new Get('https://api.thedogapi.com/v1')
   ).content();
   assertEquals(response.message, 'The Dog API');
@@ -53,7 +53,7 @@ Deno.test('Must do a simple get request', async () => {
 
 Deno.test('Must do an authenticated get request', async () => {
   const config = await env();
-  const response = await new Json<DogResponse>(
+  const response = await new JsonContent<DogResponse>(
     new AuthWithToken(
       new Get('https://api.thedogapi.com/v1'),
       config.THEDOGAPI_TOKEN
@@ -68,7 +68,7 @@ Deno.test('Must do an authenticated post request', async () => {
     image_id: 'BJa4kxc4X',
     value: 1
   };
-  const response = await new Json<VoteResponse>(
+  const response = await new JsonContent<VoteResponse>(
     new AuthWithToken(
       new Post(
         'https://api.thedogapi.com/v1/votes',
@@ -87,13 +87,13 @@ Deno.test('Must authenticated with credentials', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const tokens = await new Json<AuthTokens>(
+  const tokens = await new JsonContent<AuthTokens>(
     new Post(
       'http://localhost:8000/login',
       new JsonPayload<Credentials>(credentials)
     )
   ).content();
-  const users = await new Json<User[]>(
+  const users = await new JsonContent<User[]>(
     new Authenticated(new Get('http://localhost:8000/users'), tokens)
   ).content();
   assertEquals(users, [
@@ -110,13 +110,13 @@ Deno.test('Must delete a user', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const tokens = await new Json<AuthTokens>(
+  const tokens = await new JsonContent<AuthTokens>(
     new Post(
       'http://localhost:8000/login',
       new JsonPayload<Credentials>(credentials)
     )
   ).content();
-  const response = await new Json<string>(
+  const response = await new JsonContent<string>(
     new Authenticated(new Delete('http://localhost:8000/users/1'), tokens)
   ).content();
   assertEquals(response, 'User Ana deleted with success.');
@@ -124,7 +124,7 @@ Deno.test('Must delete a user', async () => {
 });
 
 Deno.test('Must download and save an image', async () => {
-  const file = await new File(
+  const file = await new FileContent(
     new Get('https://cdn2.thedogapi.com/images/BJa4kxc4X.jpg'),
     'black-dog.jpg'
   ).content();
@@ -136,7 +136,7 @@ Deno.test('Must download and save an image', async () => {
 Deno.test('Must upload an image', async () => {
   const config = await env();
   const blackDog = await Deno.readFile('./test/resources/black-dog.jpg');
-  const response = await new Json<UploadResponse>(
+  const response = await new JsonContent<UploadResponse>(
     new AuthWithToken(
       new Post(
         'https://api.thedogapi.com/v1/images/upload',
@@ -162,13 +162,13 @@ Deno.test('Must change a user name', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const tokens = await new Json<AuthTokens>(
+  const tokens = await new JsonContent<AuthTokens>(
     new Post(
       'http://localhost:8000/login',
       new JsonPayload<Credentials>(credentials)
     )
   ).content();
-  const response = await new Json<string>(
+  const response = await new JsonContent<string>(
     new Authenticated(
       new Put(
         'http://localhost:8000/users/1',

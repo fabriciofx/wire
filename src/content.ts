@@ -4,7 +4,7 @@ export interface Content<T> {
   content(): Promise<T>;
 }
 
-export class Json<T> implements Content<T> {
+export class JsonContent<T> implements Content<T> {
   private readonly request: Request;
 
   constructor(request: Request) {
@@ -18,7 +18,7 @@ export class Json<T> implements Content<T> {
   }
 }
 
-export class File implements Content<globalThis.File> {
+export class FileContent implements Content<File> {
   private readonly request: Request;
   private readonly name: string;
 
@@ -27,8 +27,8 @@ export class File implements Content<globalThis.File> {
     this.name = name;
   }
 
-  async content(): Promise<globalThis.File> {
+  async content(): Promise<File> {
     const { bytes } = await this.request.send();
-    return new globalThis.File([bytes], this.name);
+    return new File([bytes], this.name);
   }
 }

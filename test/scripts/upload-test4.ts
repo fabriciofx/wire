@@ -1,5 +1,5 @@
 import { AuthWithToken } from '../../src/auth.ts';
-import { Json } from '../../src/content.ts';
+import { JsonContent } from '../../src/content.ts';
 import { FormPayload, JpegPayload } from '../../src/payload.ts';
 import { Post } from '../../src/request.ts';
 import { env } from '../config.ts';
@@ -12,7 +12,7 @@ const server = new FakeHttpServer(8080);
 server.start();
 
 const config = await env();
-const response = await new Json<string>(
+const response = await new JsonContent<string>(
   new AuthWithToken(
     new Post(
       'http://localhost:8080/upload',
