@@ -159,14 +159,13 @@ export class FormPayload implements Payload {
       }
       return content;
     });
-    let total = 0;
-    for await (const content of contents) {
-      total += content.length;
-    }
-    total += this.boundary.end().length;
+    const resolved = await Promise.all(contents);
+    const total =
+      resolved.reduce((acc, content) => acc + content.length, 0) +
+      this.boundary.end().length;
     const result = new Uint8Array(total);
     let offset = 0;
-    for await (const content of contents) {
+    for (const content of resolved) {
       result.set(content, offset);
       offset += content.length;
     }
