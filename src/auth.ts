@@ -29,7 +29,7 @@ export class Authenticated implements Request {
   async send(): Promise<Response> {
     this.with(new ContentType('application/json'));
     this.with(new BearerAuth((await this.tokens.content()).access));
-    return this.origin.send();
+    return await this.origin.send();
   }
 }
 
@@ -46,9 +46,9 @@ export class AuthWithToken implements Request {
     this.origin.with(header);
   }
 
-  send(): Promise<Response> {
+  async send(): Promise<Response> {
     this.with(new ContentType('application/json'));
     this.with(new XapiAuth(this.token));
-    return this.origin.send();
+    return await this.origin.send();
   }
 }
