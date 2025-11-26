@@ -1,3 +1,4 @@
+import type { Adapter } from './content.ts';
 import {
   ContentDiposition,
   ContentLength,
@@ -6,8 +7,7 @@ import {
 } from './header.ts';
 import type { Headers } from './headers.ts';
 
-export interface Payload {
-  bytes(): Uint8Array<ArrayBuffer>;
+export interface Payload extends Adapter<Uint8Array<ArrayBuffer>> {
   headers(hdrs: Headers): Headers;
   type(): Header;
   metadata(): [string, string][];
@@ -20,9 +20,9 @@ export class TextPayload implements Payload {
     this.text = text;
   }
 
-  bytes(): Uint8Array<ArrayBuffer> {
+  adapt(): Promise<Uint8Array<ArrayBuffer>> {
     const encoder = new TextEncoder();
-    return encoder.encode(this.text);
+    return Promise.resolve(encoder.encode(this.text));
   }
 
   headers(hdrs: Headers): Headers {
@@ -46,10 +46,10 @@ export class JsonPayload<T> implements Payload {
     this.obj = obj;
   }
 
-  bytes(): Uint8Array<ArrayBuffer> {
+  adapt(): Promise<Uint8Array<ArrayBuffer>> {
     const json = JSON.stringify(this.obj);
     const encoder = new TextEncoder();
-    return encoder.encode(json);
+    return Promise.resolve(encoder.encode(json));
   }
 
   headers(hdrs: Headers): Headers {
@@ -78,8 +78,8 @@ export class JpegPayload implements Payload {
     this.meta = metadata;
   }
 
-  bytes(): Uint8Array<ArrayBuffer> {
-    return this.content;
+  adapt(): Promise<Uint8Array<ArrayBuffer>> {
+    return Promise.resolve(this.content);
   }
 
   headers(hdrs: Headers): Headers {
@@ -130,9 +130,9 @@ export class FormPayload implements Payload {
     this.boundary = new Boundary(7);
   }
 
-  bytes(): Uint8Array<ArrayBuffer> {
+  async adapt(): Promise<Uint8Array<ArrayBuffer>> {
     const encoder = new TextEncoder();
-    const contents = this.entries.map(([name, payload]) => {
+    const contents = this.entries.map(async ([name, payload]) => {
       const chunks: Uint8Array<ArrayBuffer>[] = [];
       const disposition = new ContentDiposition([
         ['name', name],
@@ -147,7 +147,7 @@ export class FormPayload implements Payload {
       chunks.push(encoder.encode(payload.type().asString()));
       // biome-ignore format: the line below needs double quotes.
       chunks.push(encoder.encode("\r\n\r\n"));
-      chunks.push(payload.bytes());
+      chunks.push(await payload.adapt());
       // biome-ignore format: the line below needs double quotes.
       chunks.push(encoder.encode("\r\n"));
       const length = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
@@ -159,17 +159,19 @@ export class FormPayload implements Payload {
       }
       return content;
     });
-    const total =
-      contents.reduce((acc, content) => acc + content.length, 0) +
-      this.boundary.end().length;
+    let total = 0;
+    for await (const content of contents) {
+      total += content.length;
+    }
+    total += this.boundary.end().length;
     const result = new Uint8Array(total);
     let offset = 0;
-    for (const content of contents) {
+    for await (const content of contents) {
       result.set(content, offset);
       offset += content.length;
     }
     result.set(encoder.encode(this.boundary.end()), offset);
-    return result;
+    return Promise.resolve(result);
   }
 
   headers(hdrs: Headers): Headers {

@@ -1,7 +1,7 @@
 import { assertFalse } from '@std/assert';
 import { FormPayload, TextPayload } from '../src/payload.ts';
 
-Deno.test('Must contains name and age data from form', () => {
+Deno.test('Must contains name and age data from form', async () => {
   const regex = new RegExp(
     '------\\d+\\s+Content-Disposition: form-data; name="name"' +
       '\\s+Content-Type: text/plain; charset=utf-8' +
@@ -16,5 +16,5 @@ Deno.test('Must contains name and age data from form', () => {
     ['name', new TextPayload('John Wick')],
     ['age', new TextPayload('42')]
   );
-  assertFalse(!regex.test(decoder.decode(payload.bytes())));
+  assertFalse(!regex.test(decoder.decode(await payload.adapt())));
 });

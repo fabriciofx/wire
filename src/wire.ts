@@ -20,7 +20,7 @@ export class FetchWire implements Wire {
         headers: params.headers.records()
       };
       if (params.payload) {
-        init.body = params.payload.bytes();
+        init.body = await params.payload.adapt();
       }
       const response = await fetch(url, init);
       if (!response.ok) {
