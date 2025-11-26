@@ -87,14 +87,16 @@ Deno.test('Must authenticated with credentials', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const tokens = await new JsonContent<AuthTokens>(
-    new Post(
-      'http://localhost:8000/login',
-      new JsonPayload<Credentials>(credentials)
-    )
-  ).adapt();
   const users = await new JsonContent<User[]>(
-    new Authenticated(new Get('http://localhost:8000/users'), tokens)
+    new Authenticated(
+      new Get('http://localhost:8000/users'),
+      new JsonContent<AuthTokens>(
+        new Post(
+          'http://localhost:8000/login',
+          new JsonPayload<Credentials>(credentials)
+        )
+      )
+    )
   ).adapt();
   assertEquals(users, [
     { id: 1, name: 'Ana' },
@@ -110,14 +112,16 @@ Deno.test('Must delete a user', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const tokens = await new JsonContent<AuthTokens>(
-    new Post(
-      'http://localhost:8000/login',
-      new JsonPayload<Credentials>(credentials)
-    )
-  ).adapt();
   const response = await new JsonContent<string>(
-    new Authenticated(new Delete('http://localhost:8000/users/1'), tokens)
+    new Authenticated(
+      new Delete('http://localhost:8000/users/1'),
+      new JsonContent<AuthTokens>(
+        new Post(
+          'http://localhost:8000/login',
+          new JsonPayload<Credentials>(credentials)
+        )
+      )
+    )
   ).adapt();
   assertEquals(response, 'User Ana deleted with success.');
   server.stop();
@@ -162,19 +166,18 @@ Deno.test('Must change a user name', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const tokens = await new JsonContent<AuthTokens>(
-    new Post(
-      'http://localhost:8000/login',
-      new JsonPayload<Credentials>(credentials)
-    )
-  ).adapt();
   const response = await new JsonContent<string>(
     new Authenticated(
       new Put(
         'http://localhost:8000/users/1',
         new JsonPayload<User>({ id: 1, name: 'Amanda' })
       ),
-      tokens
+      new JsonContent<AuthTokens>(
+        new Post(
+          'http://localhost:8000/login',
+          new JsonPayload<Credentials>(credentials)
+        )
+      )
     )
   ).adapt();
   assertEquals(
