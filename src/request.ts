@@ -5,7 +5,7 @@ import type { Response } from './response.ts';
 import { FetchWire, type Wire } from './wire.ts';
 
 export interface Request {
-  with(header: Header): void;
+  with(header: Header): Request;
   send(): Promise<Response>;
 }
 
@@ -24,8 +24,12 @@ export class Get implements Request {
     this.wire = wire;
   }
 
-  with(header: Header): void {
-    this.headers.add(header);
+  with(header: Header): Request {
+    return new Get(
+      this.url,
+      new Headers(...this.headers.items(), header),
+      this.wire
+    );
   }
 
   send(): Promise<Response> {
@@ -54,8 +58,13 @@ export class Post implements Request {
     this.wire = wire;
   }
 
-  with(header: Header): void {
-    this.headers.add(header);
+  with(header: Header): Request {
+    return new Post(
+      this.url,
+      this.payload,
+      new Headers(...this.headers.items(), header),
+      this.wire
+    );
   }
 
   send(): Promise<Response> {
@@ -82,8 +91,12 @@ export class Delete implements Request {
     this.wire = wire;
   }
 
-  with(header: Header): void {
-    this.headers.add(header);
+  with(header: Header): Request {
+    return new Delete(
+      this.url,
+      new Headers(...this.headers.items(), header),
+      this.wire
+    );
   }
 
   send(): Promise<Response> {
@@ -112,8 +125,13 @@ export class Put implements Request {
     this.wire = wire;
   }
 
-  with(header: Header): void {
-    this.headers.add(header);
+  with(header: Header): Request {
+    return new Put(
+      this.url,
+      this.payload,
+      new Headers(...this.headers.items(), header),
+      this.wire
+    );
   }
 
   send(): Promise<Response> {

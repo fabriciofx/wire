@@ -22,14 +22,14 @@ export class Authenticated implements Request {
     this.tokens = tokens;
   }
 
-  with(header: Header): void {
-    this.origin.with(header);
+  with(header: Header): Request {
+    return this.origin.with(header);
   }
 
   async send(): Promise<Response> {
-    this.with(new ContentType('application/json'));
-    this.with(new BearerAuth((await this.tokens.content()).access));
-    return await this.origin.send();
+    return await this.with(new ContentType('application/json'))
+      .with(new BearerAuth((await this.tokens.content()).access))
+      .send();
   }
 }
 
@@ -42,13 +42,13 @@ export class AuthWithToken implements Request {
     this.token = token;
   }
 
-  with(header: Header): void {
-    this.origin.with(header);
+  with(header: Header): Request {
+    return this.origin.with(header);
   }
 
   async send(): Promise<Response> {
-    this.with(new ContentType('application/json'));
-    this.with(new XapiAuth(this.token));
-    return await this.origin.send();
+    return await this.with(new ContentType('application/json'))
+      .with(new XapiAuth(this.token))
+      .send();
   }
 }

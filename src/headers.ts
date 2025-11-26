@@ -11,10 +11,6 @@ export class Headers {
     return this.list;
   }
 
-  add(header: Header) {
-    this.list.push(header);
-  }
-
   records(): Record<string, string> {
     return this.list.reduce(
       (acc, header) => {
