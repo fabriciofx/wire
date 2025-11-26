@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import type { Adapter } from './content.ts';
+import type { Content } from './content.ts';
 import {
   ContentDiposition,
   ContentLength,
@@ -8,7 +8,7 @@ import {
 } from './header.ts';
 import type { Headers } from './headers.ts';
 
-export interface Payload extends Adapter<Uint8Array<ArrayBuffer>> {
+export interface Payload extends Content<Uint8Array<ArrayBuffer>> {
   headers(hdrs: Headers): Headers;
   type(): Header;
   metadata(): [string, string][];
@@ -21,7 +21,7 @@ export class TextPayload implements Payload {
     this.text = text;
   }
 
-  adapt(): Promise<Uint8Array<ArrayBuffer>> {
+  content(): Promise<Uint8Array<ArrayBuffer>> {
     const encoder = new TextEncoder();
     return Promise.resolve(encoder.encode(this.text));
   }
@@ -47,7 +47,7 @@ export class JsonPayload<T> implements Payload {
     this.obj = obj;
   }
 
-  adapt(): Promise<Uint8Array<ArrayBuffer>> {
+  content(): Promise<Uint8Array<ArrayBuffer>> {
     const json = JSON.stringify(this.obj);
     const encoder = new TextEncoder();
     return Promise.resolve(encoder.encode(json));
@@ -68,19 +68,16 @@ export class JsonPayload<T> implements Payload {
 }
 
 export class JpegPayload implements Payload {
-  private readonly content: Uint8Array<ArrayBuffer>;
+  private readonly bytes: Uint8Array<ArrayBuffer>;
   private readonly meta: [string, string][];
 
-  constructor(
-    content: Uint8Array<ArrayBuffer>,
-    ...metadata: [string, string][]
-  ) {
-    this.content = content;
+  constructor(bytes: Uint8Array<ArrayBuffer>, ...metadata: [string, string][]) {
+    this.bytes = bytes;
     this.meta = metadata;
   }
 
-  adapt(): Promise<Uint8Array<ArrayBuffer>> {
-    return Promise.resolve(this.content);
+  content(): Promise<Uint8Array<ArrayBuffer>> {
+    return Promise.resolve(this.bytes);
   }
 
   headers(hdrs: Headers): Headers {
@@ -131,7 +128,7 @@ export class FormPayload implements Payload {
     this.boundary = new Boundary(7);
   }
 
-  async adapt(): Promise<Uint8Array<ArrayBuffer>> {
+  async content(): Promise<Uint8Array<ArrayBuffer>> {
     const encoder = new TextEncoder();
     const contents = this.entries.map(async ([name, payload]) => {
       const chunks: Uint8Array<ArrayBuffer>[] = [];
@@ -148,7 +145,7 @@ export class FormPayload implements Payload {
       chunks.push(encoder.encode(payload.type().asString()));
       // biome-ignore format: the line below needs double quotes.
       chunks.push(encoder.encode("\r\n\r\n"));
-      chunks.push(await payload.adapt());
+      chunks.push(await payload.content());
       // biome-ignore format: the line below needs double quotes.
       chunks.push(encoder.encode("\r\n"));
       return Buffer.concat(chunks);

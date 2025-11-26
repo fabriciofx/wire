@@ -47,7 +47,7 @@ type UploadResponse = {
 Deno.test('Must do a simple get request', async () => {
   const response = await new JsonContent<DogResponse>(
     new Get('https://api.thedogapi.com/v1')
-  ).adapt();
+  ).content();
   assertEquals(response.message, 'The Dog API');
 });
 
@@ -58,7 +58,7 @@ Deno.test('Must do an authenticated get request', async () => {
       new Get('https://api.thedogapi.com/v1'),
       config.THEDOGAPI_TOKEN
     )
-  ).adapt();
+  ).content();
   assertEquals(response.message, 'The Dog API');
 });
 
@@ -76,7 +76,7 @@ Deno.test('Must do an authenticated post request', async () => {
       ),
       config.THEDOGAPI_TOKEN
     )
-  ).adapt();
+  ).content();
   assertEquals(response.message, 'SUCCESS');
 });
 
@@ -97,7 +97,7 @@ Deno.test('Must authenticated with credentials', async () => {
         )
       )
     )
-  ).adapt();
+  ).content();
   assertEquals(users, [
     { id: 1, name: 'Ana' },
     { id: 2, name: 'Bruno' }
@@ -112,7 +112,7 @@ Deno.test('Must delete a user', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const response = await new JsonContent<string>(
+  const message = await new JsonContent<string>(
     new Authenticated(
       new Delete('http://localhost:8000/users/1'),
       new JsonContent<AuthTokens>(
@@ -122,8 +122,8 @@ Deno.test('Must delete a user', async () => {
         )
       )
     )
-  ).adapt();
-  assertEquals(response, 'User Ana deleted with success.');
+  ).content();
+  assertEquals(message, 'User Ana deleted with success.');
   server.stop();
 });
 
@@ -131,7 +131,7 @@ Deno.test('Must download and save an image', async () => {
   const file = await new FileContent(
     new Get('https://cdn2.thedogapi.com/images/BJa4kxc4X.jpg'),
     'black-dog.jpg'
-  ).adapt();
+  ).content();
   const bytes = await file.bytes();
   const blackDog = await Deno.readFile('./test/resources/black-dog.jpg');
   assertEquals(bytes, blackDog);
@@ -151,7 +151,7 @@ Deno.test('Must upload an image', async () => {
       ),
       config.THEDOGAPI_TOKEN
     )
-  ).adapt();
+  ).content();
   assertEquals(response.width, 1600);
   assertEquals(response.height, 1199);
   assertEquals(response.original_filename, 'black-dog.jpg');
@@ -166,7 +166,7 @@ Deno.test('Must change a user name', async () => {
     username: 'admin',
     password: '12345678'
   };
-  const response = await new JsonContent<string>(
+  const message = await new JsonContent<string>(
     new Authenticated(
       new Put(
         'http://localhost:8000/users/1',
@@ -179,9 +179,9 @@ Deno.test('Must change a user name', async () => {
         )
       )
     )
-  ).adapt();
+  ).content();
   assertEquals(
-    response,
+    message,
     'User  id: 1, name: Amanda id: 2, name: Bruno changed with success.'
   );
   server.stop();

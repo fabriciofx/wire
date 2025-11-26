@@ -16,5 +16,5 @@ Deno.test('Must contains name and age data from form', async () => {
     ['name', new TextPayload('John Wick')],
     ['age', new TextPayload('42')]
   );
-  assertFalse(!regex.test(decoder.decode(await payload.adapt())));
+  assertFalse(!regex.test(decoder.decode(await payload.content())));
 });

@@ -1,4 +1,4 @@
-import type { Adapter } from './content.ts';
+import type { Content } from './content.ts';
 import { BearerAuth, ContentType, type Header, XapiAuth } from './header.ts';
 import type { Request } from './request.ts';
 import type { Response } from './response.ts';
@@ -15,9 +15,9 @@ export type AuthTokens = {
 
 export class Authenticated implements Request {
   private readonly origin: Request;
-  private readonly tokens: Adapter<AuthTokens>;
+  private readonly tokens: Content<AuthTokens>;
 
-  constructor(request: Request, tokens: Adapter<AuthTokens>) {
+  constructor(request: Request, tokens: Content<AuthTokens>) {
     this.origin = request;
     this.tokens = tokens;
   }
@@ -28,7 +28,7 @@ export class Authenticated implements Request {
 
   async send(): Promise<Response> {
     this.with(new ContentType('application/json'));
-    this.with(new BearerAuth((await this.tokens.adapt()).access));
+    this.with(new BearerAuth((await this.tokens.content()).access));
     return this.origin.send();
   }
 }
