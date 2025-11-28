@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
 import type { Content } from './content.ts';
+import { type Func, StickyFunc } from './func.ts';
 import {
   ContentDiposition,
   ContentLength,
@@ -96,26 +97,27 @@ export class JpegPayload implements Payload {
 }
 
 class Boundary {
-  private readonly hash: string;
+  private readonly func: Func<boolean, string>;
 
   constructor(size: number) {
-    const numbers: string[] = [];
-    for (let idx = 0; idx < size; idx++) {
-      numbers.push(String(Math.floor(Math.random() * 9000) + 1000));
-    }
-    this.hash = `----${numbers.join('')}`;
+    this.func = new StickyFunc((_value: boolean) => {
+      const numbers = Array.from({ length: size }, () =>
+        String(Math.floor(Math.random() * 9000) + 1000)
+      );
+      return `----${numbers.join('')}`;
+    });
   }
 
   value(): string {
-    return this.hash;
+    return this.func.apply(true);
   }
 
   begin(): string {
-    return `--${this.hash}`;
+    return `--${this.value()}`;
   }
 
   end(): string {
-    return `--${this.hash}--`;
+    return `--${this.value()}--`;
   }
 }
 
