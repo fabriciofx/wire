@@ -15,11 +15,11 @@ export type AuthTokens = {
 
 export class Authenticated implements Request {
   private readonly origin: Request;
-  private readonly tokens: Content<AuthTokens>;
+  private readonly authtenticate: Content<AuthTokens>;
 
-  constructor(request: Request, tokens: Content<AuthTokens>) {
+  constructor(request: Request, authenticate: Content<AuthTokens>) {
     this.origin = request;
-    this.tokens = tokens;
+    this.authtenticate = authenticate;
   }
 
   with(header: Header): Request {
@@ -28,7 +28,7 @@ export class Authenticated implements Request {
 
   async send(): Promise<Response> {
     return await this.with(new ContentType('application/json'))
-      .with(new BearerAuth((await this.tokens.content()).access))
+      .with(new BearerAuth((await this.authtenticate.content()).access))
       .send();
   }
 }
