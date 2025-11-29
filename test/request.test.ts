@@ -5,7 +5,7 @@ import {
   type Credentials
 } from '../src/auth.ts';
 import { JsonContent } from '../src/content.ts';
-import { JsonPayload } from '../src/payload.ts';
+import { FormPayload, JpegPayload, JsonPayload } from '../src/payload.ts';
 import { Delete, Get, Post, Put } from '../src/request.ts';
 import { FakeHttpServer } from './server/server.ts';
 
@@ -86,6 +86,23 @@ Deno.test('Must change a user name', async () => {
     message,
     'User  id: 1, name: Amanda id: 2, name: Bruno changed with success.'
   );
+  server.stop();
+});
+
+Deno.test('Must upload an image', async () => {
+  const server = new FakeHttpServer(8000);
+  server.start();
+  const blackDog = await Deno.readFile('./test/resources/black-dog.jpg');
+  const message = await new JsonContent<string>(
+    new Post(
+      'http://localhost:8000/upload',
+      new FormPayload([
+        'file',
+        new JpegPayload(blackDog, ['filename', 'black-dog.jpg'])
+      ])
+    )
+  ).content();
+  assertEquals(message, 'Received.');
   server.stop();
 });
 
