@@ -25,10 +25,12 @@ export class FakeHttpServer implements Server {
   private readonly tokenTime: number;
   private readonly routes: Route[];
   private readonly port: number;
+  private readonly dump: boolean;
 
-  constructor(port: number, tokenTime: number = 15) {
+  constructor(port: number, tokenTime: number = 15, dump: boolean = false) {
     this.port = port;
     this.tokenTime = tokenTime;
+    this.dump = dump;
     this.server = new StickyFunc((port: number) =>
       Deno.serve({ onListen() {}, port: port }, (req) => this.actions(req))
     );
@@ -63,7 +65,7 @@ export class FakeHttpServer implements Server {
       {
         method: 'POST',
         pattern: new URLPattern({ pathname: '/upload' }),
-        action: (req) => uploadAction(req)
+        action: (req) => uploadAction(req, this.dump)
       }
     ];
   }
