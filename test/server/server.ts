@@ -1,3 +1,4 @@
+import { type Func, StickyFunc } from '../../src/func.ts';
 import { loginAction, refreshAction } from './login.ts';
 import { uploadAction } from './upload.ts';
 import {
@@ -20,14 +21,16 @@ export interface Server {
 }
 
 export class FakeHttpServer implements Server {
-  private readonly server: Deno.HttpServer<Deno.NetAddr>;
+  private readonly server: Func<number, Deno.HttpServer<Deno.NetAddr>>;
   private readonly tokenTime: number;
   private readonly routes: Route[];
+  private readonly port: number;
 
   constructor(port: number, tokenTime: number = 15) {
+    this.port = port;
     this.tokenTime = tokenTime;
-    this.server = Deno.serve({ onListen() {}, port: port }, (req) =>
-      this.actions(req)
+    this.server = new StickyFunc((port: number) =>
+      Deno.serve({ onListen() {}, port: port }, (req) => this.actions(req))
     );
     this.routes = [
       {
@@ -65,10 +68,12 @@ export class FakeHttpServer implements Server {
     ];
   }
 
-  start(): void {}
+  start(): void {
+    this.server.apply(this.port);
+  }
 
   stop(): void {
-    this.server.shutdown();
+    this.server.apply(this.port).shutdown();
   }
 
   private async actions(req: Request): Promise<Response> {
