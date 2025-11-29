@@ -17,15 +17,14 @@ export async function usersGetAction(req: Request): Promise<Response> {
   return Response.json('Unauthorized', { status: 401 });
 }
 
-export async function usersDeleteAction(req: Request): Promise<Response> {
+export async function usersDeleteAction(
+  req: Request,
+  match: URLPatternResult
+): Promise<Response> {
   if (!(await authorized(req))) {
     return Response.json('Unauthorized', { status: 401 });
   }
-  const match = /\/users\/(\d+)$/.exec(req.url);
-  if (!match) {
-    return Response.json('Bad request: URL invalid.', { status: 400 });
-  }
-  const id = Number(match[1]);
+  const id = Number(match.pathname.groups.id);
   const found = USERS.find((user) => user.id === id);
   if (!found) {
     return Response.json(`User with id ${id} not found.`, { status: 404 });
@@ -35,15 +34,14 @@ export async function usersDeleteAction(req: Request): Promise<Response> {
   });
 }
 
-export async function usersChangeAction(req: Request): Promise<Response> {
+export async function usersChangeAction(
+  req: Request,
+  match: URLPatternResult
+): Promise<Response> {
   if (!(await authorized(req))) {
     return Response.json('Unauthorized', { status: 401 });
   }
-  const match = /\/users\/(\d+)$/.exec(req.url);
-  if (!match) {
-    return Response.json('Bad request: URL invalid.', { status: 400 });
-  }
-  const id = Number(match[1]);
+  const id = Number(match.pathname.groups.id);
   const found = USERS.find((user) => user.id === id);
   if (!found) {
     return Response.json(`User with id ${id} not found.`, { status: 404 });

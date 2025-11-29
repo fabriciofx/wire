@@ -56,19 +56,6 @@ async function login(
   throw new Error('Invalid credentials.');
 }
 
-export async function loginAction(
-  req: Request,
-  tokenTime: number
-): Promise<Response> {
-  try {
-    const credentials = (await req.json()) as Credentials;
-    const tokens = await login(credentials, tokenTime);
-    return Response.json(tokens, { status: 200 });
-  } catch (error) {
-    return Response.json(error, { status: 400 });
-  }
-}
-
 export async function authorized(req: Request): Promise<boolean> {
   if (req.headers.has('Authorization')) {
     const token = req.headers.get('Authorization')?.split(' ')[1] ?? '';
@@ -80,6 +67,19 @@ export async function authorized(req: Request): Promise<boolean> {
     }
   }
   return false;
+}
+
+export async function loginAction(
+  req: Request,
+  tokenTime: number
+): Promise<Response> {
+  try {
+    const credentials = (await req.json()) as Credentials;
+    const tokens = await login(credentials, tokenTime);
+    return Response.json(tokens, { status: 200 });
+  } catch (error) {
+    return Response.json(error, { status: 400 });
+  }
 }
 
 export async function refreshAction(req: Request): Promise<Response> {
