@@ -88,3 +88,26 @@ Deno.test('Must change a user name', async () => {
   );
   server.stop();
 });
+
+Deno.test('Must refresh an authentication token', async () => {
+  const server = new FakeHttpServer(8000, 0);
+  server.start();
+  const credentials: Credentials = {
+    username: 'admin',
+    password: '12345678'
+  };
+  const tokens = await new JsonContent<AuthTokens>(
+    new Post(
+      'http://localhost:8000/login',
+      new JsonPayload<Credentials>(credentials)
+    )
+  ).content();
+  const token = await new JsonContent<{ access: string }>(
+    new Post(
+      'http://localhost:8000/refresh',
+      new JsonPayload<{ refresh: string }>({ refresh: tokens.refresh })
+    )
+  ).content();
+  assertNotEquals(tokens.access, token.access);
+  server.stop();
+});

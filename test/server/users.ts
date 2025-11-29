@@ -10,15 +10,15 @@ const USERS = [
   { id: 2, name: 'Bruno' }
 ];
 
-export function usersGetAction(req: Request): Response {
-  if (authorized(req)) {
+export async function usersGetAction(req: Request): Promise<Response> {
+  if (await authorized(req)) {
     return Response.json(USERS, { status: 201 });
   }
   return Response.json('Unauthorized', { status: 401 });
 }
 
-export function usersDeleteAction(req: Request): Response {
-  if (!authorized(req)) {
+export async function usersDeleteAction(req: Request): Promise<Response> {
+  if (!(await authorized(req))) {
     return Response.json('Unauthorized', { status: 401 });
   }
   const match = /\/users\/(\d+)$/.exec(req.url);
@@ -36,7 +36,7 @@ export function usersDeleteAction(req: Request): Response {
 }
 
 export async function usersChangeAction(req: Request): Promise<Response> {
-  if (!authorized(req)) {
+  if (!(await authorized(req))) {
     return Response.json('Unauthorized', { status: 401 });
   }
   const match = /\/users\/(\d+)$/.exec(req.url);
