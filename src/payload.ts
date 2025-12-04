@@ -169,6 +169,8 @@ export class FormPayload implements Payload {
   }
 
   metadata(): [string, string][] {
-    return [];
+    return this.entries.reduce<[string, string][]>((acc, [_, payload]) => {
+      return acc.concat(payload.metadata());
+    }, []);
   }
 }
