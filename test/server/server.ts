@@ -1,3 +1,4 @@
+import { getRandomPort } from 'get-port-please';
 import { type Func, StickyFunc } from '../../src/func.ts';
 import { loginAction, refreshAction } from './login.ts';
 import { uploadAction } from './upload.ts';
@@ -16,19 +17,20 @@ interface Route {
 }
 
 export interface Server {
-  start(): void;
-  stop(): void;
+  start(): Promise<number>;
+  stop(): Promise<void>;
+  port(): Promise<number>;
 }
 
 export class FakeHttpServer implements Server {
   private readonly server: Func<number, Deno.HttpServer<Deno.NetAddr>>;
   private readonly tokenTime: number;
   private readonly routes: Route[];
-  private readonly port: number;
+  private readonly prt: Func<boolean, Promise<number>>;
   private readonly dump: boolean;
 
-  constructor(port: number, tokenTime: number = 15, dump: boolean = false) {
-    this.port = port;
+  constructor(tokenTime: number = 15, dump: boolean = false) {
+    this.prt = new StickyFunc((_: boolean) => getRandomPort());
     this.tokenTime = tokenTime;
     this.dump = dump;
     this.server = new StickyFunc((port: number) =>
@@ -70,12 +72,19 @@ export class FakeHttpServer implements Server {
     ];
   }
 
-  start(): void {
-    this.server.apply(this.port);
+  async start(): Promise<number> {
+    const prt = await this.port();
+    this.server.apply(prt);
+    return prt;
   }
 
-  stop(): void {
-    this.server.apply(this.port).shutdown();
+  async stop(): Promise<void> {
+    const prt = await this.port();
+    this.server.apply(prt).shutdown();
+  }
+
+  async port(): Promise<number> {
+    return await this.prt.apply(true);
   }
 
   private async actions(req: Request): Promise<Response> {
