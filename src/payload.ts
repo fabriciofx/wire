@@ -17,9 +17,11 @@ export interface Payload extends Content<Uint8Array<ArrayBuffer>> {
 
 export class TextPayload implements Payload {
   private readonly text: string;
+  private readonly meta: [string, string][];
 
-  constructor(text: string) {
+  constructor(text: string, ...metadata: [string, string][]) {
     this.text = text;
+    this.meta = metadata;
   }
 
   content(): Promise<Uint8Array<ArrayBuffer>> {
@@ -36,15 +38,17 @@ export class TextPayload implements Payload {
   }
 
   metadata(): [string, string][] {
-    return [];
+    return this.meta;
   }
 }
 
 export class JsonPayload<T> implements Payload {
   private readonly obj: T;
+  private readonly meta: [string, string][];
 
-  constructor(obj: T) {
+  constructor(obj: T, ...metadata: [string, string][]) {
     this.obj = obj;
+    this.meta = metadata;
   }
 
   content(): Promise<Uint8Array<ArrayBuffer>> {
@@ -62,7 +66,7 @@ export class JsonPayload<T> implements Payload {
   }
 
   metadata(): [string, string][] {
-    return [];
+    return this.meta;
   }
 }
 
